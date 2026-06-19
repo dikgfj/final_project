@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>판교 vs 동탄 테크노밸리 비교분석 시스템</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>데이터로 진단하는 업무지구: 판교테크노밸리 vs 화성 동탄테크노밸리</h1>
+        <p>가천대학교 스마트시티학과 여지호</p>
+    </header>
+    
+    <div class="container">
+        <!-- Sidebar for Stats -->
+        <aside class="sidebar">
+            <h2>통계 비교 패널</h2>
+            <div class="stat-section">
+                <h3>토지이용</h3>
+                <canvas id="landuseChart"></canvas>
+            </div>
+            <div class="stat-section">
+                <h3>교통망 (대중교통 접근성)</h3>
+                <div id="transportStats">
+                    <p id="pangyo-label">판교 도달인구(30분): <span id="pangyo-pop">계산 중...</span></p>
+                    <p id="dongtan-label">동탄 도달인구(30분): <span id="dongtan-pop">계산 중...</span></p>
+                </div>
+            </div>
+            <div class="stat-section">
+                <h3>인구사회</h3>
+                <canvas id="demographicsChart"></canvas>
+            </div>
+        </aside>
+
+        <!-- Main Map Area -->
+        <main class="map-area">
+            <div class="map-controls">
+                <button onclick="toggleLayer('pangyo')">제1판교테크노밸리 보기</button>
+                <button onclick="toggleLayer('dongtan')">화성 동탄테크노밸리 보기</button>
+                <div class="isochrone-toggle">
+                    <label><input type="checkbox" id="iso30"> 30분 등시간권</label>
+                    <label><input type="checkbox" id="iso60"> 60분 등시간권</label>
+                </div>
+            </div>
+            <div id="map"></div>
+        </main>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js?v=5"></script>
+</body>
+</html>
