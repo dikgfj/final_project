@@ -95,6 +95,14 @@ function updateCharts(region) {
 let iso30Layer = null;
 let iso60Layer = null;
 
+// 에러를 화면에 직접 표시하는 함수 (alert 차단 대비)
+function displayErrorOnScreen(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.style.cssText = "position:fixed; top:20px; left:50%; transform:translateX(-50%); background:rgba(255,0,0,0.9); color:white; padding:15px 30px; z-index:9999; border-radius:5px; font-weight:bold;";
+    errorDiv.innerText = message;
+    document.body.appendChild(errorDiv);
+}
+
 async function loadIsochrone(region) {
     // 기존 레이어 제거 및 체크박스 초기화
     if (iso30Layer) map.removeLayer(iso30Layer);
@@ -104,37 +112,36 @@ async function loadIsochrone(region) {
     document.getElementById('iso60').checked = false;
     updatePopulationText();
 
-    // 30분 등시간권 로드
+    // Promise.all을 활용한 병렬 데이터 로드 및 강력한 에러 핸들링
     try {
-        const res30 = await fetch(`./data/${region}_iso30.geojson`);
-        if (res30.ok) {
+        const [res30, res60] = await Promise.all([
+            fetch(`data/${region}_iso30.geojson`).catch(e => e),
+            fetch(`data/${region}_iso60.geojson`).catch(e => e)
+        ]);
+
+        if (res30 && res30.ok) {
             const data30 = await res30.json();
             iso30Layer = L.geoJSON(data30, {
                 style: {color: '#ff7800', weight: 2, fillOpacity: 0.2, dashArray: '5, 5'}
             });
         } else {
-            console.warn(`30분 데이터가 없습니다: ${region}_iso30.geojson`);
+            console.warn(`30분 데이터가 없습니다: data/${region}_iso30.geojson`);
             iso30Layer = null;
         }
-    } catch (e) {
-        console.error('Error loading 30 min Isochrone', e);
-        iso30Layer = null;
-    }
 
-    // 60분 등시간권 로드
-    try {
-        const res60 = await fetch(`./data/${region}_iso60.geojson`);
-        if (res60.ok) {
+        if (res60 && res60.ok) {
             const data60 = await res60.json();
             iso60Layer = L.geoJSON(data60, {
                 style: {color: '#3388ff', weight: 2, fillOpacity: 0.1, dashArray: '5, 5'}
             });
         } else {
-            console.warn(`60분 데이터가 없습니다: ${region}_iso60.geojson`);
+            console.warn(`60분 데이터가 없습니다: data/${region}_iso60.geojson`);
             iso60Layer = null;
         }
     } catch (e) {
-        console.error('Error loading 60 min Isochrone', e);
+        console.error('Error loading Isochrones (Promise.all failed):', e);
+        displayErrorOnScreen(`[등시간권 로드 오류] ${e.message}`);
+        iso30Layer = null;
         iso60Layer = null;
     }
 }
@@ -171,17 +178,20 @@ window.toggleLayer = function(region) {
 // Load initial stats and trigger map load
 async function loadStats() {
     try {
-        const response = await fetch(`./data/stats.json`);
-        if (response.ok) {
-            window.statsData = await response.json();
-            toggleLayer('pangyo');
-        } else {
-            alert(`[오류] stats.json 파일을 불러오지 못했습니다. 상태 코드: ${response.status}\n\ndata 폴더가 깃허브에 제대로 업로드되었는지 확인해주세요.`);
-            console.error('Error loading stats', response.status);
+        const response = await fetch(`data/stats.json`);
+        if (!response.ok) {
+            throw new Error(`HTTP 상태 코드: ${response.status} (stats.json 파일을 찾을 수 없습니다)`);
         }
+        window.statsData = await response.json();
+        toggleLayer('pangyo');
     } catch (e) {
-        alert(`[네트워크 오류] stats.json 파일을 찾는 데 실패했습니다.\n${e.message}\n\n도메인 끝에 슬래시(/)가 붙어있는지 확인하거나, 깃허브 업로드 상태를 확인하세요.`);
-        console.error('Error loading stats', e);
+        console.error('Error loading stats:', e);
+        
+        // 텍스트를 '계산 중...'에서 '오류 발생'으로 변경
+        document.getElementById('pangyo-pop').innerText = '오류 발생';
+        document.getElementById('dongtan-pop').innerText = '오류 발생';
+        
+        displayErrorOnScreen(`[데이터 로드 치명적 오류] ${e.message}\ndata 폴더 경로 설정이나 파일 누락을 확인하세요.`);
     }
 }
 
