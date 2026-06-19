@@ -1,0 +1,11 @@
+{
+"type": "FeatureCollection",
+"name": "dongtan_zoning",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "DQD_AR_GBN": "상업지역" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 127.1025, 37.2 ], [ 127.1025, 37.2075 ], [ 127.09, 37.2075 ], [ 127.09, 37.2 ], [ 127.1025, 37.2 ] ] ] } },
+{ "type": "Feature", "properties": { "DQD_AR_GBN": "주거지역" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 127.115, 37.2 ], [ 127.115, 37.2075 ], [ 127.1025, 37.2075 ], [ 127.1025, 37.2 ], [ 127.115, 37.2 ] ] ] } },
+{ "type": "Feature", "properties": { "DQD_AR_GBN": "주거지역" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 127.1025, 37.2075 ], [ 127.1025, 37.215 ], [ 127.09, 37.215 ], [ 127.09, 37.2075 ], [ 127.1025, 37.2075 ] ] ] } },
+{ "type": "Feature", "properties": { "DQD_AR_GBN": "녹지지역" }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 127.115, 37.2075 ], [ 127.115, 37.215 ], [ 127.1025, 37.215 ], [ 127.1025, 37.2075 ], [ 127.115, 37.2075 ] ] ] } }
+]
+}
