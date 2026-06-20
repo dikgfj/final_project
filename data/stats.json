@@ -12,7 +12,10 @@
         ],
         "lum": 0.85,
         "far": 380,
-        "industry_mix": [70, 15, 10, 5]
+        "industry_mix": [70, 15, 10, 5],
+        "workers_30": 152000,
+        "workers_60": 1205000,
+        "road_density": 16.5
     },
     "dongtan": {
         "pop_30": 209938,
@@ -27,6 +30,9 @@
         ],
         "lum": 0.55,
         "far": 210,
-        "industry_mix": [30, 40, 25, 5]
+        "industry_mix": [30, 40, 25, 5],
+        "workers_30": 45000,
+        "workers_60": 850000,
+        "road_density": 11.2
     }
 }
