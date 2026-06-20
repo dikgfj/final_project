@@ -144,19 +144,16 @@ function styleZoning(feature) {
 }
 
 function onEachZoningFeature(feature, layer) {
-    if (feature.properties && feature.properties.DQD_AR_GBN) {
-        const usage = feature.properties.DQD_AR_GBN;
-        // Mock properties for interaction demonstration
-        let far = usage === '상업지역' ? Math.floor(Math.random()*150 + 250) : 
-                  usage === '주거지역' ? Math.floor(Math.random()*50 + 150) : 
-                  usage === '공업지역' ? Math.floor(Math.random()*100 + 200) : 0;
-        let area = Math.floor(Math.random() * 5000 + 1000);
+    if (feature.properties) {
+        const usage = feature.properties.DQD_AR_GBN || '정보 없음';
+        const far = feature.properties.far || 0;
+        const area = feature.properties.gross_area || 0;
         
         let popupContent = `<div style="font-family:'Malgun Gothic', sans-serif;">
-                            <h4 style="margin:0 0 5px 0; border-bottom:1px solid #ccc; padding-bottom:3px;">필지 속성 정보</h4>
+                            <h4 style="margin:0 0 5px 0; border-bottom:1px solid #ccc; padding-bottom:3px;">건축물 실제 속성 정보</h4>
                             <b>주용도:</b> ${usage}<br/>
-                            <b>용적률:</b> ${far}%<br/>
-                            <b>연면적:</b> ${area.toLocaleString()} m²
+                            <b>용적률:</b> ${parseFloat(far).toFixed(1)}%<br/>
+                            <b>연면적:</b> ${parseFloat(area).toLocaleString()} m²
                             </div>`;
         layer.bindPopup(popupContent);
     }
@@ -186,7 +183,7 @@ async function loadIsochrone(region) {
         const [res30, res60, resZoning, resBoundary] = await Promise.all([
             fetch(`data/${region}_iso30.geojson`).catch(e => e),
             fetch(`data/${region}_iso60.geojson`).catch(e => e),
-            fetch(`data/${region}_zoning.geojson`).catch(e => e),
+            fetch(`data/${region}_buildings.geojson`).catch(e => e),
             fetch(`data/${region}_boundary.geojson`).catch(e => e)
         ]);
 
