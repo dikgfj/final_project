@@ -121,6 +121,46 @@ function updateCharts() {
 
 let iso30Layer = null;
 let iso60Layer = null;
+let zoningLayer = null;
+let boundaryLayer = null;
+
+function getZoningColor(d) {
+    return d === '주거지역' ? '#f4a582' :
+           d === '상업지역' ? '#ca0020' :
+           d === '공업지역' ? '#92c5de' :
+           d === '녹지지역' ? '#0571b0' :
+                              '#ffffff';
+}
+
+function styleZoning(feature) {
+    return {
+        fillColor: getZoningColor(feature.properties.DQD_AR_GBN),
+        weight: 1,
+        opacity: 1,
+        color: '#666',
+        dashArray: '3',
+        fillOpacity: 0.6
+    };
+}
+
+function onEachZoningFeature(feature, layer) {
+    if (feature.properties && feature.properties.DQD_AR_GBN) {
+        const usage = feature.properties.DQD_AR_GBN;
+        // Mock properties for interaction demonstration
+        let far = usage === '상업지역' ? Math.floor(Math.random()*150 + 250) : 
+                  usage === '주거지역' ? Math.floor(Math.random()*50 + 150) : 
+                  usage === '공업지역' ? Math.floor(Math.random()*100 + 200) : 0;
+        let area = Math.floor(Math.random() * 5000 + 1000);
+        
+        let popupContent = `<div style="font-family:'Malgun Gothic', sans-serif;">
+                            <h4 style="margin:0 0 5px 0; border-bottom:1px solid #ccc; padding-bottom:3px;">필지 속성 정보</h4>
+                            <b>주용도:</b> ${usage}<br/>
+                            <b>용적률:</b> ${far}%<br/>
+                            <b>연면적:</b> ${area.toLocaleString()} m²
+                            </div>`;
+        layer.bindPopup(popupContent);
+    }
+}
 
 // 에러를 화면에 직접 표시하는 함수 (alert 차단 대비)
 function displayErrorOnScreen(message) {
@@ -134,6 +174,8 @@ async function loadIsochrone(region) {
     // 기존 레이어 제거 및 체크박스 초기화
     if (iso30Layer) map.removeLayer(iso30Layer);
     if (iso60Layer) map.removeLayer(iso60Layer);
+    if (zoningLayer) map.removeLayer(zoningLayer);
+    if (boundaryLayer) map.removeLayer(boundaryLayer);
     
     document.getElementById('iso30').checked = false;
     document.getElementById('iso60').checked = false;
@@ -141,10 +183,31 @@ async function loadIsochrone(region) {
 
     // Promise.all을 활용한 병렬 데이터 로드 및 강력한 에러 핸들링
     try {
-        const [res30, res60] = await Promise.all([
+        const [res30, res60, resZoning, resBoundary] = await Promise.all([
             fetch(`data/${region}_iso30.geojson`).catch(e => e),
-            fetch(`data/${region}_iso60.geojson`).catch(e => e)
+            fetch(`data/${region}_iso60.geojson`).catch(e => e),
+            fetch(`data/${region}_zoning.geojson`).catch(e => e),
+            fetch(`data/${region}_boundary.geojson`).catch(e => e)
         ]);
+
+        if (resBoundary && resBoundary.ok) {
+            const dataBoundary = await resBoundary.json();
+            boundaryLayer = L.geoJSON(dataBoundary, {
+                style: {color: '#000', weight: 4, fillOpacity: 0}
+            }).addTo(map);
+        }
+
+        if (resZoning && resZoning.ok) {
+            const dataZoning = await resZoning.json();
+            zoningLayer = L.geoJSON(dataZoning, {
+                style: styleZoning,
+                onEachFeature: onEachZoningFeature
+            });
+            const chk = document.getElementById('layerZoning');
+            if (!chk || chk.checked) {
+                zoningLayer.addTo(map);
+            }
+        }
 
         if (res30 && res30.ok) {
             const data30 = await res30.json();
@@ -184,6 +247,14 @@ document.getElementById('iso60').addEventListener('change', (e) => {
     else if (iso60Layer) map.removeLayer(iso60Layer);
     updatePopulationText();
 });
+
+const layerZoningElem = document.getElementById('layerZoning');
+if (layerZoningElem) {
+    layerZoningElem.addEventListener('change', (e) => {
+        if (e.target.checked && zoningLayer) zoningLayer.addTo(map);
+        else if (zoningLayer) map.removeLayer(zoningLayer);
+    });
+}
 
 window.toggleLayer = function(region) {
     currentRegion = region;
