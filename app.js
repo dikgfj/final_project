@@ -11,12 +11,17 @@ window.statsData = null; // Store stats globally
 
 // Charts Initialization
 let landUseChart = new Chart(document.getElementById('landuseChart').getContext('2d'), {
-    type: 'pie',
+    type: 'bar',
     data: {
         labels: ['주거지역', '상업지역', '공업지역', '녹지지역'],
         datasets: [{
+            label: '판교테크노밸리',
             data: [0, 0, 0, 0],
-            backgroundColor: ['#f4a582', '#ca0020', '#92c5de', '#0571b0']
+            backgroundColor: '#1a4f8b'
+        }, {
+            label: '동탄테크노밸리',
+            data: [0, 0, 0, 0],
+            backgroundColor: '#ca0020'
         }]
     }
 });
@@ -26,89 +31,90 @@ let demoChart = new Chart(document.getElementById('demographicsChart').getContex
     data: {
         labels: ['총인구 수', '종사자 수'],
         datasets: [{
-            label: '인원수(명)',
+            label: '판교테크노밸리',
             data: [0, 0],
             backgroundColor: '#1a4f8b'
+        }, {
+            label: '동탄테크노밸리',
+            data: [0, 0],
+            backgroundColor: '#ca0020'
         }]
     }
 });
 
 let industryChart = new Chart(document.getElementById('industryChart').getContext('2d'), {
-    type: 'doughnut',
+    type: 'bar',
     data: {
         labels: ['IT/지식첨단', '상업/서비스', '제조업', '기타'],
         datasets: [{
+            label: '판교테크노밸리',
             data: [0, 0, 0, 0],
-            backgroundColor: ['#2ca25f', '#99d8c9', '#e5f5f9', '#f0f0f0']
+            backgroundColor: '#1a4f8b'
+        }, {
+            label: '동탄테크노밸리',
+            data: [0, 0, 0, 0],
+            backgroundColor: '#ca0020'
         }]
     }
 });
 
 // Update population text based on checkbox states
 function updatePopulationText() {
-    if (!window.statsData || !window.statsData[currentRegion]) return;
+    if (!window.statsData) return;
     
-    const pangyoPopElem = document.getElementById('pangyo-pop');
-    const dongtanPopElem = document.getElementById('dongtan-pop');
-    const pangyoLabelElem = document.getElementById('pangyo-label');
-    const dongtanLabelElem = document.getElementById('dongtan-label');
-    
-    // Determine which population to show based on checkboxes
-    let popKey = 'pop_30'; // default
+    let popKey = 'pop_30';
+    let workKey = 'workers_30';
     let timeText = '(30분)';
     const is30 = document.getElementById('iso30').checked;
     const is60 = document.getElementById('iso60').checked;
     
     if (is60) {
         popKey = 'pop_60';
+        workKey = 'workers_60';
         timeText = '(60분)';
     } else if (is30) {
         popKey = 'pop_30';
-        timeText = '(30분)';
-    } else {
-        popKey = 'pop_30'; // 기본값
+        workKey = 'workers_30';
         timeText = '(30분)';
     }
     
-    if (pangyoPopElem && window.statsData.pangyo) {
-        const popStr = window.statsData.pangyo[popKey].toLocaleString() + ' 명';
-        if (pangyoLabelElem) {
-            pangyoLabelElem.innerHTML = `판교 도달인구${timeText}: <span id="pangyo-pop">${popStr}</span>`;
-        } else {
-            pangyoPopElem.innerText = popStr;
-        }
+    if (window.statsData.pangyo) {
+        document.getElementById('pangyo-label').innerHTML = `판교 도달인구${timeText}: <span id="pangyo-pop">${window.statsData.pangyo[popKey].toLocaleString()}</span> 명 (종사자: <span id="pangyo-work">${window.statsData.pangyo[workKey].toLocaleString()}</span> 명)`;
     }
-    if (dongtanPopElem && window.statsData.dongtan) {
-        const popStr = window.statsData.dongtan[popKey].toLocaleString() + ' 명';
-        if (dongtanLabelElem) {
-            dongtanLabelElem.innerHTML = `동탄 도달인구${timeText}: <span id="dongtan-pop">${popStr}</span>`;
-        } else {
-            dongtanPopElem.innerText = popStr;
-        }
+    if (window.statsData.dongtan) {
+        document.getElementById('dongtan-label').innerHTML = `동탄 도달인구${timeText}: <span id="dongtan-pop">${window.statsData.dongtan[popKey].toLocaleString()}</span> 명 (종사자: <span id="dongtan-work">${window.statsData.dongtan[workKey].toLocaleString()}</span> 명)`;
     }
 }
 
-function updateCharts(region) {
-    if (!window.statsData || !window.statsData[region]) return;
-    const stats = window.statsData[region];
+function updateCharts() {
+    if (!window.statsData) return;
+    const pStats = window.statsData.pangyo || {};
+    const dStats = window.statsData.dongtan || {};
     
     // Update Land Use Chart
-    landUseChart.data.datasets[0].data = stats.land_use || [0,0,0,0];
+    landUseChart.data.datasets[0].data = pStats.land_use || [0,0,0,0];
+    landUseChart.data.datasets[1].data = dStats.land_use || [0,0,0,0];
     landUseChart.update();
     
     // Update LUM and FAR text
-    document.getElementById('lum-val').innerText = stats.lum ? stats.lum.toFixed(2) : '0';
-    document.getElementById('far-val').innerText = stats.far || '0';
+    document.getElementById('pangyo-lum').innerText = pStats.lum ? pStats.lum.toFixed(2) : '0';
+    document.getElementById('dongtan-lum').innerText = dStats.lum ? dStats.lum.toFixed(2) : '0';
+    document.getElementById('pangyo-far').innerText = pStats.far || '0';
+    document.getElementById('dongtan-far').innerText = dStats.far || '0';
+    
+    // Update Road Density text
+    document.getElementById('pangyo-road').innerText = pStats.road_density || '0';
+    document.getElementById('dongtan-road').innerText = dStats.road_density || '0';
     
     // Update Demographics Chart
-    demoChart.data.datasets[0].data = [stats.pop_total || 0, stats.workers || 0];
+    demoChart.data.datasets[0].data = [pStats.pop_total || 0, pStats.workers || 0];
+    demoChart.data.datasets[1].data = [dStats.pop_total || 0, dStats.workers || 0];
     demoChart.update();
     
     // Update Industry Chart
-    if(stats.industry_mix) {
-        industryChart.data.datasets[0].data = stats.industry_mix;
-        industryChart.update();
-    }
+    industryChart.data.datasets[0].data = pStats.industry_mix || [0,0,0,0];
+    industryChart.data.datasets[1].data = dStats.industry_mix || [0,0,0,0];
+    industryChart.update();
     
     updatePopulationText();
 }
@@ -189,8 +195,8 @@ window.toggleLayer = function(region) {
         map.setView([37.21, 127.09], 15);
     }
     
-    // 통계 차트 업데이트 (사이드바 연동)
-    updateCharts(region);
+    // 통계 차트 업데이트 (사이드바 연동) - 항상 두 지역 모두 비교
+    updateCharts();
     
     // 등시간권 데이터 백그라운드 로드
     loadIsochrone(region);
