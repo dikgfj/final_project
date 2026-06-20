@@ -125,11 +125,12 @@ let zoningLayer = null;
 let boundaryLayer = null;
 
 function getZoningColor(d) {
-    return d === '주거지역' ? '#f4a582' :
-           d === '상업지역' ? '#ca0020' :
-           d === '공업지역' ? '#92c5de' :
-           d === '녹지지역' ? '#0571b0' :
-                              '#ffffff';
+    if (!d) return '#ffffff';
+    if (d.includes('주택')) return '#f4a582'; // 주거
+    if (d.includes('근린생활') || d.includes('판매') || d.includes('업무') || d.includes('상업')) return '#ca0020'; // 상업/업무
+    if (d.includes('공장') || d.includes('창고') || d.includes('자동차')) return '#92c5de'; // 공업/물류
+    if (d.includes('교육') || d.includes('연구')) return '#0571b0'; // 교육/연구
+    return '#cccccc'; // 기타
 }
 
 function styleZoning(feature) {
