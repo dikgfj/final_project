@@ -134,21 +134,22 @@ function getZoningColor(d) {
 }
 
 function styleZoning(feature) {
+    const usage = feature.properties.DQD_AR_GBN || feature.properties.주용도코드명 || '';
     return {
-        fillColor: getZoningColor(feature.properties.DQD_AR_GBN),
-        weight: 1,
-        opacity: 1,
-        color: '#666',
-        dashArray: '3',
-        fillOpacity: 0.6
+        fill: true,
+        fillColor: getZoningColor(usage),
+        fillOpacity: 0.65,
+        stroke: true,
+        color: '#333333',
+        weight: 1
     };
 }
 
 function onEachZoningFeature(feature, layer) {
     if (feature.properties) {
-        const usage = feature.properties.DQD_AR_GBN || '정보 없음';
-        const far = feature.properties.far || 0;
-        const area = feature.properties.gross_area || 0;
+        const usage = feature.properties.DQD_AR_GBN || feature.properties.주용도코드명 || '정보 없음';
+        const far = feature.properties.far || feature.properties['용적률'] || 0;
+        const area = feature.properties.gross_area || feature.properties['연면적'] || 0;
         
         let popupContent = `<div style="font-family:'Malgun Gothic', sans-serif;">
                             <h4 style="margin:0 0 5px 0; border-bottom:1px solid #ccc; padding-bottom:3px;">건축물 실제 속성 정보</h4>
