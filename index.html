@@ -26,6 +26,10 @@
             <div class="stat-section">
                 <h3>토지이용</h3>
                 <canvas id="landuseChart"></canvas>
+                <div id="landuseExtraStats" style="margin-top: 10px; font-size: 0.9em; background: #eef3f9; padding: 10px; border-radius: 5px;">
+                    <p style="margin: 3px 0;"><strong>토지이용 혼합도(LUM):</strong> <span id="lum-val">계산 중...</span></p>
+                    <p style="margin: 3px 0;"><strong>평균 용적률:</strong> <span id="far-val">계산 중...</span>%</p>
+                </div>
             </div>
             <div class="stat-section">
                 <h3>교통망 (대중교통 접근성)</h3>
@@ -37,6 +41,8 @@
             <div class="stat-section">
                 <h3>인구사회</h3>
                 <canvas id="demographicsChart"></canvas>
+                <h4 style="margin: 15px 0 5px; font-size: 0.95em; text-align: center;">산업분류별 구성비 (%)</h4>
+                <canvas id="industryChart"></canvas>
             </div>
         </aside>
 

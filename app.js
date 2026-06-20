@@ -33,6 +33,17 @@ let demoChart = new Chart(document.getElementById('demographicsChart').getContex
     }
 });
 
+let industryChart = new Chart(document.getElementById('industryChart').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+        labels: ['IT/지식첨단', '상업/서비스', '제조업', '기타'],
+        datasets: [{
+            data: [0, 0, 0, 0],
+            backgroundColor: ['#2ca25f', '#99d8c9', '#e5f5f9', '#f0f0f0']
+        }]
+    }
+});
+
 // Update population text based on checkbox states
 function updatePopulationText() {
     if (!window.statsData || !window.statsData[currentRegion]) return;
@@ -85,9 +96,19 @@ function updateCharts(region) {
     landUseChart.data.datasets[0].data = stats.land_use || [0,0,0,0];
     landUseChart.update();
     
+    // Update LUM and FAR text
+    document.getElementById('lum-val').innerText = stats.lum ? stats.lum.toFixed(2) : '0';
+    document.getElementById('far-val').innerText = stats.far || '0';
+    
     // Update Demographics Chart
     demoChart.data.datasets[0].data = [stats.pop_total || 0, stats.workers || 0];
     demoChart.update();
+    
+    // Update Industry Chart
+    if(stats.industry_mix) {
+        industryChart.data.datasets[0].data = stats.industry_mix;
+        industryChart.update();
+    }
     
     updatePopulationText();
 }
