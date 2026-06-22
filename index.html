@@ -33,10 +33,11 @@
             </div>
             <div class="stat-section">
                 <h3>교통망 (대중교통 접근성)</h3>
-                <div id="transportStats">
-                    <p id="pangyo-label" style="margin: 5px 0;">판교 도달인구(30분): <span id="pangyo-pop">계산 중...</span> (종사자: <span id="pangyo-work">계산 중...</span>)</p>
-                    <p id="dongtan-label" style="margin: 5px 0;">동탄 도달인구(30분): <span id="dongtan-pop">계산 중...</span> (종사자: <span id="dongtan-work">계산 중...</span>)</p>
-                    <p style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ccc;"><strong>보조 지표 (도로망 밀도):</strong> 판교 <span id="pangyo-road">계산 중...</span> km/km² | 동탄 <span id="dongtan-road">계산 중...</span> km/km²</p>
+                <canvas id="transportChart"></canvas>
+                <div id="transportStats" style="margin-top: 10px; font-size: 0.9em; background: #eef3f9; padding: 10px; border-radius: 5px;">
+                    <p id="pangyo-label" style="margin: 3px 0;">판교 도달인구(30분): <span id="pangyo-pop">계산 중...</span> (종사자: <span id="pangyo-work">계산 중...</span>)</p>
+                    <p id="dongtan-label" style="margin: 3px 0;">동탄 도달인구(30분): <span id="dongtan-pop">계산 중...</span> (종사자: <span id="dongtan-work">계산 중...</span>)</p>
+                    <p style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #ccc; font-weight: bold;">보조 지표 (도로망 밀도): 판교 <span id="pangyo-road">계산 중...</span> | 동탄 <span id="dongtan-road">계산 중...</span> km/km²</p>
                 </div>
             </div>
             <div class="stat-section">

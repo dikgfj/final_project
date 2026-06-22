@@ -42,6 +42,22 @@ let demoChart = new Chart(document.getElementById('demographicsChart').getContex
     }
 });
 
+let transportChart = new Chart(document.getElementById('transportChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+        labels: ['30분 도달 인구', '30분 도달 종사자'],
+        datasets: [{
+            label: '판교테크노밸리',
+            data: [0, 0],
+            backgroundColor: '#1a4f8b'
+        }, {
+            label: '동탄테크노밸리',
+            data: [0, 0],
+            backgroundColor: '#ca0020'
+        }]
+    }
+});
+
 let industryChart = new Chart(document.getElementById('industryChart').getContext('2d'), {
     type: 'bar',
     data: {
@@ -80,10 +96,14 @@ function updatePopulationText() {
     
     if (window.statsData.pangyo) {
         document.getElementById('pangyo-label').innerHTML = `판교 도달인구${timeText}: <span id="pangyo-pop">${window.statsData.pangyo[popKey].toLocaleString()}</span> 명 (종사자: <span id="pangyo-work">${window.statsData.pangyo[workKey].toLocaleString()}</span> 명)`;
+        transportChart.data.datasets[0].data = [window.statsData.pangyo[popKey], window.statsData.pangyo[workKey]];
     }
     if (window.statsData.dongtan) {
         document.getElementById('dongtan-label').innerHTML = `동탄 도달인구${timeText}: <span id="dongtan-pop">${window.statsData.dongtan[popKey].toLocaleString()}</span> 명 (종사자: <span id="dongtan-work">${window.statsData.dongtan[workKey].toLocaleString()}</span> 명)`;
+        transportChart.data.datasets[1].data = [window.statsData.dongtan[popKey], window.statsData.dongtan[workKey]];
     }
+    transportChart.data.labels = [`${timeText.replace('(', '').replace(')', '')} 도달 인구`, `${timeText.replace('(', '').replace(')', '')} 도달 종사자`];
+    transportChart.update();
 }
 
 function updateCharts() {
